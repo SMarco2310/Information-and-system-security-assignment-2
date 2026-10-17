@@ -5,22 +5,20 @@ let mode = 'signin'
 
 function render() {
   const reg = mode === 'register'
-  $('title').textContent = reg ? 'Register a passkey' : 'Sign in'
+  $('title').textContent = reg ? 'Create your passkey' : 'Sign in with passkey'
   $('subtitle').textContent = reg
     ? 'Link a passkey to your university account. First-time setup only.'
-    : 'Use your passkey — no password needed.'
+    : 'Use your fingerprint, face or security key. No password to remember.'
   $('name-field').hidden = !reg
-  $('id-label').textContent = reg ? 'University email or ID' : 'University email or ID (optional)'
   $('submit').textContent = reg ? 'Create passkey' : 'Sign in with passkey'
-  $('footer').innerHTML = reg
-    ? 'Already registered? <a href="#" id="toggle">Sign in</a>'
-    : 'First time here? <a href="#" id="toggle">Register a passkey</a>'
-  $('toggle').addEventListener('click', e => {
-    e.preventDefault()
-    mode = reg ? 'signin' : 'register'
-    render()
-  })
+  $('divider-text').textContent = reg ? 'already registered?' : 'first time here?'
+  $('toggle').textContent = reg ? 'Back to sign in' : 'Register a new passkey'
 }
+
+$('toggle').addEventListener('click', () => {
+  mode = mode === 'register' ? 'signin' : 'register'
+  render()
+})
 
 $('form').addEventListener('submit', async e => {
   e.preventDefault()
