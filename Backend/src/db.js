@@ -22,6 +22,7 @@ db.exec(`
     code        TEXT PRIMARY KEY,
     title       TEXT NOT NULL,
     semester    TEXT NOT NULL,
+    credits     INTEGER NOT NULL DEFAULT 3,
     lecturer_id TEXT NOT NULL REFERENCES users(id)
   );
 

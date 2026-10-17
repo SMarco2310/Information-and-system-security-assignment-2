@@ -1,4 +1,4 @@
-import { setSession } from './data.js'
+import { api } from './api.js'
 
 const $ = id => document.getElementById(id)
 let mode = 'signin'
@@ -33,7 +33,8 @@ $('form').addEventListener('submit', async e => {
   //   startRegistration / startAuthentication from @simplewebauthn/browser
   await new Promise(r => setTimeout(r, 900))
 
-  setSession(role)
+
+  await api('/api/dev/login', { method: 'POST', body: { userId: role === 'student' ? 'S1042' : 'L201' } })
   location.href = role === 'student' ? 'student.html' : 'lecturer.html'
 })
 

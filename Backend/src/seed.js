@@ -7,13 +7,13 @@ const students = [
 ]
 const lecturers = [['L201', 'Dr. Daniel Okafor'], ['L202', 'Prof. Li Tan']]
 const courses = [
-  ['CS310', 'Information Security', '2025 / Sem 2', 'L201'],
-  ['CS240', 'Data Structures', '2025 / Sem 2', 'L201'],
-  ['MA201', 'Discrete Mathematics', '2025 / Sem 1', 'L202']
+  ['CS310', 'Information Security', '2025 / Sem 2', 4, 'L201'],
+  ['CS240', 'Data Structures', '2025 / Sem 2', 4, 'L201'],
+  ['MA201', 'Discrete Mathematics', '2025 / Sem 1', 3, 'L202']
 ]
 
 const insertUser = db.prepare('INSERT OR REPLACE INTO users (id, name, role) VALUES (?, ?, ?)')
-const insertCourse = db.prepare('INSERT OR REPLACE INTO courses (code, title, semester, lecturer_id) VALUES (?, ?, ?, ?)')
+const insertCourse = db.prepare('INSERT OR REPLACE INTO courses (code, title, semester, credits, lecturer_id) VALUES (?, ?, ?, ?, ?)')
 const insertGrade = db.prepare('INSERT OR REPLACE INTO grades (student_id, course_code, coursework, exam) VALUES (?, ?, ?, ?)')
 
 // A transaction makes all the inserts succeed or fail together (and is much faster)
