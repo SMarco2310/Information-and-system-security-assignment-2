@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · University Grade Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-layout">
+    <section class="card">
+      <div class="crest" aria-hidden="true">U</div>
+      <h1 id="title">Sign in</h1>
+      <p class="subtitle" id="subtitle">Use your passkey — no password needed.</p>
+
+      <form class="form" id="form">
+        <div class="field" id="name-field" hidden>
+          <label for="fullname">Full name</label>
+          <input id="fullname" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="identifier" id="id-label">University email or ID (optional)</label>
+          <input id="identifier" autocomplete="username webauthn" placeholder="s1042@university.edu">
+        </div>
+
+        <button class="btn block" id="submit" type="submit">Sign in with passkey</button>
+        <p class="status" id="status" role="status" hidden></p>
+
+        <p class="note">Passkeys use your fingerprint, face, screen lock or a security key. They can’t be phished and are never sent to the portal.</p>
+
+        <fieldset class="preview">
+          <legend>Demo only: preview as</legend>
+          <label><input type="radio" name="role" value="student" checked> Student</label>
+          <label><input type="radio" name="role" value="lecturer"> Lecturer</label>
+        </fieldset>
+      </form>
+
+      <footer class="footer" id="footer"></footer>
+    </section>
+  </div>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

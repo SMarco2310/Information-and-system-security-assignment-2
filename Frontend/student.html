@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Grades · University Grade Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+  <main class="content">
+    <div class="page-head">
+      <div><h1>My Grades</h1><p>You can only see your own results.</p></div>
+      <select class="select" id="semester" aria-label="Filter by semester"></select>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Course</th><th>Semester</th><th class="num">Credits</th>
+          <th class="num">Coursework (40%)</th><th class="num">Exam (60%)</th>
+          <th class="num">Total</th><th>Grade</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+  <script type="module" src="js/student.js"></script>
+</body>
+</html>

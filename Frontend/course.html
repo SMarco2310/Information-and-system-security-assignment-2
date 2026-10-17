@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Grades · University Grade Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar" id="topbar"></header>
+  <main class="content">
+    <a class="back" href="lecturer.html">← All courses</a>
+    <div class="page-head">
+      <div><h1 id="course-title"></h1><p id="course-semester"></p></div>
+      <button class="btn secondary" id="save" type="button">Save grades</button>
+    </div>
+    <p class="banner" id="banner" role="status" hidden></p>
+    <div class="stats" id="stats"></div>
+    <input class="search" id="search" type="search" placeholder="Search student name or ID" aria-label="Search students">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Student</th><th class="num">Coursework (40%)</th><th class="num">Exam (60%)</th>
+          <th class="num">Total</th><th>Grade</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+  <script type="module" src="js/course.js"></script>
+</body>
+</html>
