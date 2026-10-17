@@ -1,16 +1,24 @@
-import { studentResults, totalScore, letterFor, pointsFor } from './data.js'
-import { renderTopbar, badge, statCard, esc } from './layout.js'
+import { totalScore, letterFor, pointsFor } from './data.js'
+import { fetchStudentGrades } from './api.js'
+import { renderTopbar, badge, statCard, esc, showError } from './layout.js'
 
-if (renderTopbar('student')) {
-  const rows = studentResults.map(r => {
+const session = await renderTopbar('student')
+if (session) {
+  let results = []
+  try {
+    results = await fetchStudentGrades(session.id)
+  } catch (err) {
+    showError(err)
+  }
+  const rows = results.map(r => {
     const total = totalScore(r.coursework, r.exam)
     const letter = letterFor(total)
     return { ...r, total, letter, points: pointsFor(letter) }
   })
 
   const credits = rows.reduce((s, r) => s + r.credits, 0)
-  const gpa = (rows.reduce((s, r) => s + r.points * r.credits, 0) / credits).toFixed(2)
-  const average = Math.round(rows.reduce((s, r) => s + r.total, 0) / rows.length)
+  const gpa = credits ? (rows.reduce((s, r) => s + r.points * r.credits, 0) / credits).toFixed(2) : '–'
+  const average = rows.length ? Math.round(rows.reduce((s, r) => s + r.total, 0) / rows.length) : 0
 
   document.getElementById('stats').innerHTML =
     statCard('Cumulative GPA', gpa, 'out of 4.00') +

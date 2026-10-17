@@ -16,31 +16,31 @@
       <p class="subtitle" id="subtitle">Use your fingerprint, face or security key. No password to remember.</p>
 
       <form class="form" id="form">
-        <div class="input-icon" id="name-field" hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-          <input id="fullname" autocomplete="name" placeholder="Full name" aria-label="Full name">
-        </div>
-        <div class="input-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-          <input id="identifier" autocomplete="username webauthn" placeholder="University email or ID" aria-label="University email or ID">
+        <div class="form" id="register-fields" hidden>
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <input id="user-id" autocomplete="username" placeholder="University ID (e.g. S1042)" aria-label="University ID">
+          </div>
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 9.2-9.2M16 7l3 3"/></svg>
+            <input id="code" autocomplete="off" spellcheck="false" placeholder="One-time code, e.g. 06a9-f979-c858-7efd" aria-label="One-time enrolment code">
+          </div>
         </div>
 
         <button class="btn block" id="submit" type="submit">Sign in with passkey</button>
         <p class="status" id="status" role="status" hidden></p>
+        <p class="status error" id="error" role="alert" hidden></p>
 
-        <div class="divider"><span id="divider-text">or</span></div>
+        <div class="divider"><span id="divider-text">first time here?</span></div>
         <button class="btn outline block" id="toggle" type="button">Register a new passkey</button>
-
-        <fieldset class="preview">
-          <legend>Demo only: preview as</legend>
-          <label><input type="radio" name="role" value="student" checked> Student</label>
-          <label><input type="radio" name="role" value="lecturer"> Lecturer</label>
-        </fieldset>
       </form>
 
       <p class="note">Passkeys can’t be phished and are never sent to the portal.</p>
     </section>
   </div>
+  <script type="importmap">
+  { "imports": { "simple-webauthn-browser": "./vendor/simplewebauthn-browser/index.js" } }
+  </script>
   <script type="module" src="js/login.js"></script>
 </body>
 </html>
