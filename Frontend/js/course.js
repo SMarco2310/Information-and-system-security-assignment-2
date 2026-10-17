@@ -1,12 +1,21 @@
-import { lecturerCourses, totalScore, letterFor } from './data.js'
-import { renderTopbar, badge, statCard, esc } from './layout.js'
+import { totalScore, letterFor } from './data.js'
+import { fetchCourse } from './api.js'
+import { renderTopbar, badge, statCard, esc, showError } from './layout.js'
 
-if (renderTopbar('lecturer')) {
+if (await renderTopbar('lecturer')) {
   const code = new URLSearchParams(location.search).get('code')
-  const course = lecturerCourses.find(c => c.code === code)
+  let course = null
+  let loadError = null
+  try {
+    course = await fetchCourse(code)
+  } catch (err) {
+    loadError = err
+  }
   const $ = id => document.getElementById(id)
 
-  if (!course) {
+  if (loadError && loadError.message !== 'Course not found') {
+    showError(loadError)
+  } else if (!course) {
     document.querySelector('.content').innerHTML = '<h1>Course not found</h1><a href="lecturer.html">← Back to courses</a>'
   } else {
     const students = course.students.map(s => ({ ...s }))

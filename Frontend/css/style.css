@@ -167,3 +167,5 @@ td input[type=number]:focus { outline: 2px solid var(--gold); outline-offset: 1p
 
 button, input, select, textarea { font-family: inherit; }
 h1, h2, h3 { letter-spacing: -0.01em; }
+.status.error { background: var(--danger-soft); color: var(--danger); }
+.auth-card .form .form { gap: .75rem; }
