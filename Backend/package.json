@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "db:seed": "node src/seed.js",
-    "db:demo": "node src/query-demo.js"
+    "db:demo": "node src/query-demo.js",
+    "demo:aes": "node src/aes-demo.js"
   },
   "keywords": [],
   "author": "",
