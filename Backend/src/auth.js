@@ -7,6 +7,7 @@ import {
   verifyAuthenticationResponse
 } from '@simplewebauthn/server'
 import db from './db.js'
+import { startSession, endSession } from './session.js'
 
 const router = Router()
 
@@ -18,7 +19,6 @@ const rpName = 'University Grade Portal'
 
 // ---------- Temporary memory (cleared when the server restarts) ----------
 const challenges = new Map() // challenge text -> { type, userId, expires }
-const sessions = new Map()   // session token -> userId
 
 const sha256 = text => crypto.createHash('sha256').update(text).digest('hex')
 
@@ -42,24 +42,6 @@ function useChallenge(body, type) {
   return { challenge, userId: saved.userId }
 }
 
-// Logs a user in: makes a random session token and sends it as a cookie
-function startSession(res, userId) {
-  const token = crypto.randomBytes(32).toString('base64url')
-  sessions.set(token, userId)
-  res.cookie('sid', token, { httpOnly: true, sameSite: 'lax', maxAge: 8 * 60 * 60 * 1000 })
-}
-
-// ---------- Check that the user is logged in (used by other routes later) ----------
-export function requireLogin(req, res, next) {
-  const userId = sessions.get(req.cookies.sid)
-  const user = userId && db.prepare('SELECT id, name, role FROM users WHERE id = ?').get(userId)
-  if (!user) {
-    return res.status(401).json({ error: 'Please sign in to continue.' })
-  }
-  req.user = user
-  next()
-}
-
 // =============== REGISTER A PASSKEY ===============
 
 // Step 1: the user sends their ID and one-time code. If the code is right,
@@ -74,7 +56,7 @@ router.post('/register/options', async (req, res) => {
 
   // Same message for every failure, so nobody can find out which IDs exist
   if (!codeIsGood) {
-    return res.status(403).json({ error: 'Invalid or expired enrolment code.' })
+    return res.status(403).json({ error: 'forbidden', message: 'Invalid or expired enrolment code.' })
   }
 
   const options = await generateRegistrationOptions({
@@ -98,7 +80,7 @@ router.post('/register/options', async (req, res) => {
 router.post('/register/verify', async (req, res) => {
   const saved = useChallenge(req.body, 'register')
   if (!saved) {
-    return res.status(400).json({ error: 'Registration expired. Please start again.' })
+    return res.status(400).json({ error: 'bad_request', message: 'Registration expired. Please start again.' })
   }
 
   let result
@@ -111,10 +93,10 @@ router.post('/register/verify', async (req, res) => {
       requireUserVerification: true
     })
   } catch {
-    return res.status(400).json({ error: 'Passkey could not be verified.' })
+    return res.status(400).json({ error: 'bad_request', message: 'Passkey could not be verified.' })
   }
   if (!result.verified) {
-    return res.status(400).json({ error: 'Passkey could not be verified.' })
+    return res.status(400).json({ error: 'bad_request', message: 'Passkey could not be verified.' })
   }
 
   const passkey = result.registrationInfo.credential
@@ -142,7 +124,7 @@ router.post('/login/options', async (req, res) => {
 
 // Step 2: check the signed challenge with the public key we saved earlier
 router.post('/login/verify', async (req, res) => {
-  const failed = () => res.status(401).json({ error: 'Sign-in failed. Use a passkey registered for this portal.' })
+  const failed = () => res.status(401).json({ error: 'unauthenticated', message: 'Sign-in failed. Use a passkey registered for this portal.' })
 
   const saved = useChallenge(req.body, 'login')
   if (!saved) return failed()
@@ -182,15 +164,11 @@ router.post('/login/verify', async (req, res) => {
   res.json({ user })
 })
 
-// =============== WHO AM I / LOG OUT ===============
-
-router.get('/me', requireLogin, (req, res) => {
-  res.json({ user: req.user })
-})
+// =============== LOG OUT ===============
+// (GET /api/me lives in routes/grades.js)
 
 router.post('/logout', (req, res) => {
-  sessions.delete(req.cookies.sid)
-  res.clearCookie('sid')
+  endSession(req, res)
   res.json({ ok: true })
 })
 

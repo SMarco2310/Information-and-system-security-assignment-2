@@ -1,4 +1,4 @@
-import { fetchMe, logout } from './api.js'
+import { api } from './api.js'
 
 export const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
@@ -10,21 +10,23 @@ export function badge(letter) {
 export const statCard = (label, value, hint = '') =>
   `<div class="stat"><span class="label">${esc(label)}</span><strong class="value">${esc(value)}</strong>${hint ? `<span class="hint">${esc(hint)}</span>` : ''}</div>`
 
-/** Renders the top bar and returns the signed-in user. The SERVER decides who that is (GET /api/me). */
+const homeFor = role => (role === 'student' ? 'student.html' : 'lecturer.html')
+
+/** Asks the SERVER who is signed in, draws the top bar, and returns the user (or null).
+ * the API enforces the real rules. */
 export async function renderTopbar(expectedRole) {
-  let session = null
+  let session
   try {
-    session = (await fetchMe()).user
-  } catch {
-    location.replace('login.html')
+    session = await api('/api/me')
+  } catch (e) {
+    if (e.status !== 401) document.querySelector('.content').innerHTML = `<p class="banner warn">${esc(e.message)}</p>`
     return null
   }
-  const homeFor = role => (role === 'student' ? 'student.html' : 'lecturer.html')
   if (expectedRole && session.role !== expectedRole) {
     location.replace(homeFor(session.role))
     return null
   }
-  const home = session.role === 'student' ? 'student.html' : 'lecturer.html'
+  const home = homeFor(session.role)
   const label = session.role === 'student' ? 'My Grades' : 'My Courses'
   document.getElementById('topbar').innerHTML = `
     <div class="inner">
@@ -36,14 +38,8 @@ export async function renderTopbar(expectedRole) {
       </div>
     </div>`
   document.getElementById('signout').addEventListener('click', async () => {
-    try { await logout() } finally { location.href = 'login.html' }
+    try { await api('/api/logout', { method: 'POST' }) } catch { /* go to login regardless */ }
+    location.href = 'login.html'
   })
   return session
-}
-
-/** Replace the page body with a friendly error (e.g. backend not running). */
-export function showError(err) {
-  const el = document.querySelector('.content')
-  el.innerHTML = `<div class="banner warn" role="alert">Could not load data: ${esc(err.message)}.
-    Is the backend running on http://localhost:4000?</div>`
 }

@@ -3,9 +3,9 @@
 Students view their own grades. Lecturers manage grades for their assigned courses.
 Sign-in is meant to use WebAuthn passkeys (no password).
 
-> Status: real WebAuthn passkey enrolment, sign-in and server sessions work.
-> Server-side role checks on the data routes, the AES-GCM demo and the test
-> evidence are still to do.
+> Status: real WebAuthn passkey enrolment, sign-in, server sessions and
+> server-side role/ownership checks work. Automated tests cover T2–T6
+> (`npm test` in `Backend/`); the AES-GCM demo is `npm run demo:aes`.
 
 ## Structure
 
@@ -103,7 +103,8 @@ before issuing an enrolment credential, and would not print codes to a console. 
 | --- | --- |
 | `npm run dev` | Start API with auto-restart |
 | `npm start` | Start API |
-| `npm run db:seed` | Fill the database with dummy users, courses and grades |
+| `npm run db:seed` | Reset the database with fake users, courses, grades and one-time enrolment codes |
+| `npm test` | Run the automated RBAC tests (T2–T6) on a throwaway database |
 | `npm run db:demo` | Run example queries against the database |
 
 Reset the database: delete `Backend/portal.db`, then run `npm run db:seed`.

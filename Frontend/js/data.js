@@ -1,4 +1,5 @@
-// Grade helpers and the demo session. Grade data now comes from the API (see api.js).
+// Grade helpers only. All records now come from the Express API (see api.js).
+
 
 export const COURSEWORK_WEIGHT = 0.4
 export const EXAM_WEIGHT = 0.6

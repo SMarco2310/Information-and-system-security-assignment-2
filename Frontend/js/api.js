@@ -1,35 +1,27 @@
-const API_BASE = 'http://localhost:4000/api'
+// credentials:'include' sends the session cookie.
+export const API = 'http://localhost:4000'
 
-async function request(method, path, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    credentials: 'include',            // send the httpOnly session cookie
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body: body ? JSON.stringify(body) : undefined
-  })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    const err = new Error(data.error || `Request failed (${res.status})`)
-    err.status = res.status
-    throw err
-  }
-  return data
+export class ApiError extends Error {
+  constructor(message, status) { super(message); this.status = status }
 }
 
-const get = path => request('GET', path)
-const post = (path, body) => request('POST', path, body ?? {})
-
-// Data
-export const fetchStudentGrades = id => get(`/students/${encodeURIComponent(id)}/grades`)
-export const fetchLecturerCourses = id => get(`/lecturers/${encodeURIComponent(id)}/courses`)
-export const fetchCourse = code => get(`/courses/${encodeURIComponent(code)}`)
-
-// Passkey enrolment and sign-in (server verifies everything)
-export const registerOptions = (userId, code) => post('/register/options', { userId, code })
-export const registerVerify = attestation => post('/register/verify', attestation)
-export const loginOptions = () => post('/login/options')
-export const loginVerify = assertion => post('/login/verify', assertion)
-
-// Session
-export const fetchMe = () => get('/me')
-export const logout = () => post('/logout')
+export async function api(path, { method = 'GET', body, redirectOn401 = true } = {}) {
+  let res
+  try {
+    res = await fetch(API + path, {
+      method,
+      credentials: 'include',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    })
+  } catch {
+    throw new ApiError('Cannot reach the server. Is the backend running?', 0)
+  }
+  const data = await res.json().catch(() => null)
+  if (res.status === 401 && redirectOn401) {   // no / expired / logged-out session
+    location.replace('login.html')
+    throw new ApiError('Please sign in.', 401)
+  }
+  if (!res.ok) throw new ApiError(data?.message || 'Request failed.', res.status)
+  return data
+}

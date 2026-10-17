@@ -1,8 +1,11 @@
 import { startRegistration, startAuthentication } from 'simple-webauthn-browser'
-import { registerOptions, registerVerify, loginOptions, loginVerify } from './api.js'
+import { api } from './api.js'
 
 const $ = id => document.getElementById(id)
 let mode = 'signin'
+
+// These calls happen before anyone is signed in, so a 401 must not bounce to the login page
+const post = (path, body) => api(path, { method: 'POST', body: body ?? {}, redirectOn401: false })
 
 function render() {
   const reg = mode === 'register'
@@ -35,14 +38,14 @@ function setError(err) {
   $('status').hidden = true
 }
 
+function goToHomePage(user) {
+  location.href = user.role === 'student' ? 'student.html' : 'lecturer.html'
+}
+
 $('toggle').addEventListener('click', () => {
   mode = mode === 'register' ? 'signin' : 'register'
   render()
 })
-
-function goToHomePage(user) {
-  location.href = user.role === 'student' ? 'student.html' : 'lecturer.html'
-}
 
 // Enrolment: server checks the one-time code, we create a passkey, server verifies and stores the PUBLIC key.
 async function enrol() {
@@ -51,12 +54,12 @@ async function enrol() {
   if (!userId || !code) throw new Error('Enter your university ID and enrolment code.')
 
   setStatus('Checking your enrolment code…')
-  const optionsJSON = await registerOptions(userId, code)
+  const optionsJSON = await post('/api/register/options', { userId, code })
   const who = optionsJSON.account
   setStatus(`Creating a passkey for ${who.name} (${who.role}). Follow your device prompt…`)
   const attestation = await startRegistration({ optionsJSON })
   setStatus('Verifying with the server…')
-  const { user } = await registerVerify(attestation)
+  const { user } = await post('/api/register/verify', attestation)
 
   // Registration also signs the user in, so go straight to their page
   $('code').value = ''
@@ -66,11 +69,11 @@ async function enrol() {
 // Sign-in: server issues a fresh challenge, the passkey signs it, the server verifies and starts the session.
 async function signIn() {
   setStatus('Requesting a challenge…')
-  const optionsJSON = await loginOptions()
+  const optionsJSON = await post('/api/login/options')
   setStatus('Follow your device prompt to verify it’s you…')
   const assertion = await startAuthentication({ optionsJSON })
   setStatus('Verifying with the server…')
-  const { user } = await loginVerify(assertion)
+  const { user } = await post('/api/login/verify', assertion)
   goToHomePage(user)
 }
 
